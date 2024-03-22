@@ -1,5 +1,15 @@
-locals {
-  folder_id   = var.folder_id
+
+terraform {
+  required_providers {
+    yandex = {
+      source = "yandex-cloud/yandex"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
+provider "yandex" {
+  zone = var.zone_name
 }
 
 resource "yandex_kubernetes_cluster" "k8s-zonal" {
@@ -32,7 +42,7 @@ resource "yandex_vpc_network" "mynet" {
 resource "yandex_vpc_subnet" "mysubnet" {
   name = "mysubnet"
   v4_cidr_blocks = ["10.1.0.0/16"]
-  zone           = "ru-central1-a"
+  zone           = var.zone_name
   network_id     = yandex_vpc_network.mynet.id
 }
 
@@ -43,28 +53,28 @@ resource "yandex_iam_service_account" "myaccount" {
 
 resource "yandex_resourcemanager_folder_iam_member" "k8s-clusters-agent" {
   # Сервисному аккаунту назначается роль "k8s.clusters.agent".
-  folder_id = local.folder_id
+  folder_id = var.folder_id
   role      = "k8s.clusters.agent"
   member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "vpc-public-admin" {
   # Сервисному аккаунту назначается роль "vpc.publicAdmin".
-  folder_id = local.folder_id
+  folder_id = var.folder_id
   role      = "vpc.publicAdmin"
   member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "images-puller" {
   # Сервисному аккаунту назначается роль "container-registry.images.puller".
-  folder_id = local.folder_id
+  folder_id = var.folder_id
   role      = "container-registry.images.puller"
   member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "encrypterDecrypter" {
   # Сервисному аккаунту назначается роль "kms.keys.encrypterDecrypter".
-  folder_id = local.folder_id
+  folder_id = var.folder_id
   role      = "kms.keys.encrypterDecrypter"
   member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
 }

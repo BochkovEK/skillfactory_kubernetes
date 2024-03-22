@@ -3,6 +3,6 @@ variable "folder_id" {
 }
 
 variable "zone_name" {
-  default = "my-zone"
+  default = "ru-central1-a"
 }
 
