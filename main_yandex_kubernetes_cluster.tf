@@ -8,8 +8,15 @@ terraform {
   required_version = ">= 0.13"
 }
 
+// Configure the Yandex.Cloud provider
+// Folder id (skillfactory: b1g93fsq8gqfkrjj0t2k)
+// Cloud id (cloud-hoy85: b1g3fuk1gs418fa34ng4)
 provider "yandex" {
-  zone = var.zone_name
+  #token                    = "auth_token_here"
+  service_account_key_file = "/root/regional-k8s-account-key.json"
+  cloud_id                 = var.cloud_id
+  folder_id                = var.folder_id
+  zone                     = var.zone_name
 }
 
 resource "yandex_kubernetes_cluster" "k8s-zonal" {
