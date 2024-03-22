@@ -14,3 +14,13 @@ variable "zone_name" {
   type = string
 }
 
+variable "ssh_key_path" {
+  description = "ssh_key_path"
+  type        = string
+}
+
+variable "vm_user" {
+  description = "vm_user"
+  type        = string
+}
+
