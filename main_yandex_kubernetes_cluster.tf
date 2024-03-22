@@ -19,28 +19,28 @@ provider "yandex" {
   zone                     = var.zone_name
 }
 
-resource "yandex_kubernetes_cluster" "k8s-zonal" {
-  name = "k8s-zonal"
-  network_id = yandex_vpc_network.mynet.id
-  master {
-    master_location {
-      zone      = yandex_vpc_subnet.mysubnet.zone
-      subnet_id = yandex_vpc_subnet.mysubnet.id
-    }
-    security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
-  }
-  service_account_id      = yandex_iam_service_account.myaccount.id
-  node_service_account_id = yandex_iam_service_account.myaccount.id
-  depends_on = [
-    yandex_resourcemanager_folder_iam_member.k8s-clusters-agent,
-    yandex_resourcemanager_folder_iam_member.vpc-public-admin,
-    yandex_resourcemanager_folder_iam_member.images-puller,
-    yandex_resourcemanager_folder_iam_member.encrypterDecrypter
-  ]
-  kms_provider {
-    key_id = yandex_kms_symmetric_key.kms-key.id
-  }
-}
+#resource "yandex_kubernetes_cluster" "k8s-zonal" {
+#  name = "k8s-zonal"
+#  network_id = yandex_vpc_network.mynet.id
+#  master {
+#    master_location {
+#      zone      = yandex_vpc_subnet.mysubnet.zone
+#      subnet_id = yandex_vpc_subnet.mysubnet.id
+#    }
+#    security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
+#  }
+#  service_account_id      = yandex_iam_service_account.myaccount.id
+#  node_service_account_id = yandex_iam_service_account.myaccount.id
+#  depends_on = [
+#    yandex_resourcemanager_folder_iam_member.k8s-clusters-agent,
+#    yandex_resourcemanager_folder_iam_member.vpc-public-admin,
+#    yandex_resourcemanager_folder_iam_member.images-puller,
+#    yandex_resourcemanager_folder_iam_member.encrypterDecrypter
+#  ]
+#  kms_provider {
+#    key_id = yandex_kms_symmetric_key.kms-key.id
+#  }
+#}
 
 resource "yandex_vpc_network" "mynet" {
   name = "mynet"
@@ -53,45 +53,45 @@ resource "yandex_vpc_subnet" "mysubnet" {
   network_id     = yandex_vpc_network.mynet.id
 }
 
-resource "yandex_iam_service_account" "myaccount" {
-  name        = "zonal-k8s-account"
-  description = "K8S zonal service account"
-}
+#resource "yandex_iam_service_account" "myaccount" {
+#  name        = "zonal-k8s-account"
+#  description = "K8S zonal service account"
+#}
 
-resource "yandex_resourcemanager_folder_iam_member" "k8s-clusters-agent" {
-  # Сервисному аккаунту назначается роль "k8s.clusters.agent".
-  folder_id = var.folder_id
-  role      = "k8s.clusters.agent"
-  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "vpc-public-admin" {
-  # Сервисному аккаунту назначается роль "vpc.publicAdmin".
-  folder_id = var.folder_id
-  role      = "vpc.publicAdmin"
-  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "images-puller" {
-  # Сервисному аккаунту назначается роль "container-registry.images.puller".
-  folder_id = var.folder_id
-  role      = "container-registry.images.puller"
-  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "encrypterDecrypter" {
-  # Сервисному аккаунту назначается роль "kms.keys.encrypterDecrypter".
-  folder_id = var.folder_id
-  role      = "kms.keys.encrypterDecrypter"
-  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
-}
-
-resource "yandex_kms_symmetric_key" "kms-key" {
-  # Ключ Yandex Key Management Service для шифрования важной информации, такой как пароли, OAuth-токены и SSH-ключи.
-  name              = "kms-key"
-  default_algorithm = "AES_128"
-  rotation_period   = "8760h" # 1 год.
-}
+#resource "yandex_resourcemanager_folder_iam_member" "k8s-clusters-agent" {
+#  # Сервисному аккаунту назначается роль "k8s.clusters.agent".
+#  folder_id = var.folder_id
+#  role      = "k8s.clusters.agent"
+#  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
+#}
+#
+#resource "yandex_resourcemanager_folder_iam_member" "vpc-public-admin" {
+#  # Сервисному аккаунту назначается роль "vpc.publicAdmin".
+#  folder_id = var.folder_id
+#  role      = "vpc.publicAdmin"
+#  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
+#}
+#
+#resource "yandex_resourcemanager_folder_iam_member" "images-puller" {
+#  # Сервисному аккаунту назначается роль "container-registry.images.puller".
+#  folder_id = var.folder_id
+#  role      = "container-registry.images.puller"
+#  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
+#}
+#
+#resource "yandex_resourcemanager_folder_iam_member" "encrypterDecrypter" {
+#  # Сервисному аккаунту назначается роль "kms.keys.encrypterDecrypter".
+#  folder_id = var.folder_id
+#  role      = "kms.keys.encrypterDecrypter"
+#  member    = "serviceAccount:${yandex_iam_service_account.myaccount.id}"
+#}
+#
+#resource "yandex_kms_symmetric_key" "kms-key" {
+#  # Ключ Yandex Key Management Service для шифрования важной информации, такой как пароли, OAuth-токены и SSH-ключи.
+#  name              = "kms-key"
+#  default_algorithm = "AES_128"
+#  rotation_period   = "8760h" # 1 год.
+#}
 
 resource "yandex_vpc_security_group" "k8s-public-services" {
   name        = "k8s-public-services"
@@ -143,7 +143,7 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
 
 resource "yandex_compute_instance_group" "k8s-masters" {
   name               = "k8s-masters"
-  service_account_id = yandex_iam_service_account.myaccount
+  service_account_id = var.service_account_id
   depends_on = [
     yandex_vpc_network.mynet,
     yandex_vpc_subnet.mysubnet,
@@ -165,7 +165,7 @@ resource "yandex_compute_instance_group" "k8s-masters" {
     # Загрузочный диск в виртуальных машинах в Instance Groups
     boot_disk {
       initialize_params {
-        image_id = "fd8vmcue7aajpmeo39kk" # Ubuntu 20.04 LTS
+        image_id = "fd864gbboths76r8gm5f" # ubuntu-2204-lts
         size     = 10
         type     = "network-ssd"
       }
@@ -181,7 +181,7 @@ resource "yandex_compute_instance_group" "k8s-masters" {
     }
 
     metadata = {
-      ssh-keys = "ubuntu:${file("id_rsa.pub")}"
+      ssh-keys = "ubuntu:${file(${ssh_key_path})}"
     }
     network_settings {
       type = "STANDARD"
@@ -212,7 +212,7 @@ resource "yandex_compute_instance_group" "k8s-masters" {
 
 resource "yandex_compute_instance_group" "k8s-workers" {
   name               = "k8s-workers"
-  service_account_id = yandex_iam_service_account.myaccount.id
+  service_account_id = var.service_account_id
   depends_on = [
     yandex_vpc_network.mynet,
     yandex_vpc_subnet.mysubnet,
@@ -230,7 +230,7 @@ resource "yandex_compute_instance_group" "k8s-workers" {
 
     boot_disk {
       initialize_params {
-        image_id = "fd8vmcue7aajpmeo39kk" # Ubuntu 20.04 LTS
+        image_id = "fd864gbboths76r8gm5f" # ubuntu-2204-lts
         size     = 10
         type     = "network-hdd"
       }
@@ -246,7 +246,7 @@ resource "yandex_compute_instance_group" "k8s-workers" {
     }
 
     metadata = {
-      ssh-keys = "ubuntu:${file("id_rsa.pub")}"
+      ssh-keys = "ubuntu:${file(${ssh_key_path})}"
     }
     network_settings {
       type = "STANDARD"
