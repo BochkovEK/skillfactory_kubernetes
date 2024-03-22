@@ -181,7 +181,7 @@ resource "yandex_compute_instance_group" "k8s-masters" {
     }
 
     metadata = {
-      ssh-keys = "ubuntu:${file(${ssh_key_path})}"
+      ssh-keys = "ubuntu:${file("${ssh_key_path}")}"
     }
     network_settings {
       type = "STANDARD"
@@ -246,7 +246,7 @@ resource "yandex_compute_instance_group" "k8s-workers" {
     }
 
     metadata = {
-      ssh-keys = "ubuntu:${file(${ssh_key_path})}"
+      ssh-keys = "ubuntu:${file("${ssh_key_path}")}"
     }
     network_settings {
       type = "STANDARD"
