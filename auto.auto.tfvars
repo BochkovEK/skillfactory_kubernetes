@@ -1,0 +1,5 @@
+zone                = "ru-central1-a"
+folder_id           = "b1g93fsq8gqfkrjj0t2k"
+cloud_id            = "b1g3fuk1gs418fa34ng4"
+vm_user             = "test_user"
+ssh_key_path        = "id_rsa.pub"
