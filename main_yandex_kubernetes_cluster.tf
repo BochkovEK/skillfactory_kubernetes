@@ -272,3 +272,68 @@ resource "yandex_compute_instance_group" "k8s-workers" {
     max_deleting    = 1
   }
 }
+
+# srv instance
+
+resource "yandex_compute_instance_group" "srv" {
+  name               = "srv"
+  service_account_id = var.service_account_id
+  depends_on = [
+    yandex_vpc_network.mynet,
+    yandex_vpc_subnet.mysubnet,
+  ]
+
+  instance_template {
+
+    name = "srv"
+
+    resources {
+      cores  = 2
+      memory = 4
+      core_fraction = 20
+    }
+
+    boot_disk {
+      initialize_params {
+        image_id = "fd864gbboths76r8gm5f" # ubuntu-2204-lts
+        size     = 20
+        type     = "network-hdd"
+      }
+    }
+
+    network_interface {
+      network_id = yandex_vpc_network.mynet.id
+      subnet_ids = [
+        yandex_vpc_subnet.mysubnet.id,
+      ]
+      # Флаг nat true указывает что виртуалкам будет предоставлен публичный IP адрес.
+      nat = true
+    }
+
+    metadata = {
+      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
+    }
+    network_settings {
+      type = "STANDARD"
+    }
+  }
+
+  scale_policy {
+    fixed_scale {
+      size = 1
+    }
+  }
+
+  allocation_policy {
+    zones = [
+      var.zone_name,
+    ]
+  }
+
+  deploy_policy {
+    max_unavailable = 1
+    max_creating    = 1
+    max_expansion   = 1
+    max_deleting    = 1
+  }
+}
