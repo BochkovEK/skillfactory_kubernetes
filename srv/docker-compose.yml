@@ -18,7 +18,7 @@ services:
 #      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
 #      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
 #      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
-    - $HOME/ssl_gitlab:/etc/gitlab/ssl
+    - $HOME/ssl:/etc/gitlab/ssl
 
 #    networks:
 #      - gitlab_net
@@ -30,7 +30,7 @@ services:
     depends_on:
       - gitlab
     volumes:
-      - $HOME/ssl_gitlab/my-gitlab.crt:/etc/gitlab-runner/ssl/my-gitlab.crt
+      - $HOME/ssl:/etc/gitlab-runner/ssl
       - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
 #    networks:
 #      - gitlab_net
