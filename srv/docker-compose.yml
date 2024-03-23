@@ -1,4 +1,5 @@
-version: '3.5'
+#version: '3.5'
+
 services:
   gitlab:
     image: gitlab/gitlab-ce:latest
@@ -16,7 +17,7 @@ services:
 #      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
 #      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
 #      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
-    - my-gitlab.crt:/etc/gitlab/ssl/my-gitlab.crt
+    - ./my-gitlab.crt:/etc/gitlab/ssl/my-gitlab.crt
 
 #    networks:
 #      - gitlab_net
@@ -27,7 +28,7 @@ services:
     depends_on:
       - gitlab
     volumes:
-      - my-gitlab.crt:/etc/gitlab-runner/ssl/my-gitlab.crt
+      - ./my-gitlab.crt:/etc/gitlab-runner/ssl/my-gitlab.crt
       - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
 #    networks:
 #      - gitlab_net
