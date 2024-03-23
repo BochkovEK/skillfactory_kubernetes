@@ -13,7 +13,7 @@ terraform {
 // Cloud id (cloud-hoy85: b1g3fuk1gs418fa34ng4)
 provider "yandex" {
   #token                    = "auth_token_here"
-  service_account_key_file = "/root/regional-k8s-account-key.json"
+  service_account_key_file = "/root/admin.json"
   cloud_id                 = var.cloud_id
   folder_id                = var.folder_id
   zone                     = var.zone_name
@@ -57,7 +57,7 @@ resource "yandex_vpc_subnet" "mysubnet" {
 #  name        = "zonal-k8s-account"
 #  description = "K8S zonal service account"
 #}
-
+#
 #resource "yandex_resourcemanager_folder_iam_member" "k8s-clusters-agent" {
 #  # Сервисному аккаунту назначается роль "k8s.clusters.agent".
 #  folder_id = var.folder_id
