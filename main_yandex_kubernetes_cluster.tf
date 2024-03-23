@@ -275,8 +275,8 @@ resource "yandex_compute_instance_group" "k8s-workers" {
 
 # srv instance
 
-resource "yandex_compute_instance_group" "srv" {
-  name               = "srv"
+resource "yandex_compute_instance_group" "srvs" {
+  name               = "srvs"
   service_account_id = var.service_account_id
   depends_on = [
     yandex_vpc_network.mynet,
@@ -285,7 +285,7 @@ resource "yandex_compute_instance_group" "srv" {
 
   instance_template {
 
-    name = "srv"
+    name = "srv-{instance.index}"
 
     resources {
       cores  = 2
