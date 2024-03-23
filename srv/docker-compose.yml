@@ -1,0 +1,36 @@
+version: '3.5'
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    hostname: gitlab
+    restart: unless-stopped
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 22
+        external_url 'https://my-gitlab:443'
+    ports:
+    - "443:443"
+    - "80:80"
+    - "2022:22"
+    volumes:
+#      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
+#      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
+#      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+    - my-gitlab.crt:/etc/gitlab/ssl/my-gitlab.crt
+
+#    networks:
+#      - gitlab_net
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    depends_on:
+      - gitlab
+    volumes:
+      - my-gitlab.crt:/etc/gitlab-runner/ssl/my-gitlab.crt
+      - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+#    networks:
+#      - gitlab_net
+
+#networks:
+#  gitlab_net:
