@@ -1,0 +1,16 @@
+#docker compose -f docker-compose-nexus.yml
+volumes:
+  nexus-data: {}
+
+services:
+  nexus:
+    #docker exec -it nexus cat /nexus-data/admin.password
+    container_name: nexus
+    image: sonatype/nexus3
+    restart: always
+    volumes:
+      - "nexus-data:/sonatype-work"
+    ports:
+      - "8081:8081"
+      - "8085:8085"
+      - "5000:5000"
