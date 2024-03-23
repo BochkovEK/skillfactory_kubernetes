@@ -2,6 +2,7 @@
 
 services:
   gitlab:
+    container_name: my-gitlab
     image: gitlab/gitlab-ce:latest
     hostname: gitlab
     restart: unless-stopped
@@ -23,6 +24,7 @@ services:
 #      - gitlab_net
 
   gitlab-runner:
+    container_name: gitlab-runner
     image: gitlab/gitlab-runner:alpine
     restart: unless-stopped
     depends_on:
