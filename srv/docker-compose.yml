@@ -30,10 +30,10 @@ services:
     restart: always
     volumes:
     - "nexus-data:/sonatype-work"
-#    ports:
-#    - "8081:8081"
+    ports:
+    - "8081:8081"
 #    - "8085:8085"
-#    - "5000:5000"
+    - "5000:5000"
     networks:
     - srv-network
 
