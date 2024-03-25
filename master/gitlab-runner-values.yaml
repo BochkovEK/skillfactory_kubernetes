@@ -1,5 +1,6 @@
 imagePullPolicy: IfNotPresent
 gitlabUrl: https://my-gitlab.my.domain
+runnerRegistrationToken: "sGwQJ-hBexBZTveuvhZp"
 terminationGracePeriodSeconds: 3600
 concurrent: 2
 checkInterval: 30
@@ -31,7 +32,7 @@ runners:
         image = "alpine"
         privileged = true
   executor: kubernetes
-  secret: dev-gitlab-runner
+#  secret: dev-gitlab-runner
 podSecurityContext:
   runAsUser: 100
   # runAsGroup: 65533
