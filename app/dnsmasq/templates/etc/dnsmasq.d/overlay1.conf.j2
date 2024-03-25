@@ -1,0 +1,21 @@
+listen-address=::1
+listen-address=127.0.0.1
+listen-address={{ ansible_default_ipv4.address }}
+bind-interfaces
+
+no-resolv
+no-hosts
+
+log-queries
+domain-needed
+bogus-priv
+strict-order
+expand-hosts
+
+server=::1#5353
+server=127.0.0.1#5353
+
+cache-size=5000
+
+#from playbook
+{{ hosts_dnsmasq_1 }}

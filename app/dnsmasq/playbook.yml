@@ -1,0 +1,86 @@
+- hosts:
+    - nameserver
+  become: yes
+  vars:
+    dns_server: "192.168.1.203"
+    domain: "my.domain"
+    dnsmasq_overlay_1:  |
+      domain={{ domain }}
+      local=/{{ domain }}/
+      addn-hosts=/etc/hosts.dnsmasq
+      resolv-file=/etc/resolv.conf.upstream
+
+      dhcp-range=192.168.1.210,192.168.1.250,12h
+      dhcp-option=option:router,192.168.1.1
+      dhcp-option=option:dns-server,{{ dns_server }}
+      dhcp-option=option:netmask,255.255.255.0
+
+      dhcp-host={{ dns_server }}
+
+    hosts_dnsmasq_1: |
+      address=/my-gitlab.{{ domain }}/192.168.1.201
+      address=/my-nexus.{{ domain }}/192.168.1.201
+      #address=/ubuntu1.{{ domain }}/192.168.1.201
+      #address=/ubuntu.{{ domain }}/192.168.1.200
+
+  tasks:
+
+  - name: Install dnsmasq and dependencies
+    package:
+      name: [ 'dnsmasq', 'dnsutils' ]
+
+  - name: Set hostname fact
+    set_fact:
+      hostname_alias1: "{{ ansible_hostname }}"
+
+  - name: Dnsmasq overlay config
+    lineinfile:
+      dest: /etc/dnsmasq.conf
+      regexp: '^conf-dir=/etc/dnsmasq.d.*'
+      line: conf-dir=/etc/dnsmasq.d/,*.conf
+
+  - name: Build overlay-conf1
+    template:
+      src: templates/etc/dnsmasq.d/overlay1.conf.j2
+      dest: /etc/dnsmasq.d/overlay1.conf
+
+  - name: Build hosts.dnsmasq
+    template:
+      src: templates/etc/hosts.dnsmasq.j2
+      dest: /etc/hosts.dnsmasq
+
+  - name: Copy /etc/resolv.conf.upstream
+    copy:
+      src: /etc/resolv.conf
+      dest: /etc/resolv.conf.upstream
+      force: false
+      remote_src: true
+
+  - name: Empty leases
+    file:
+      path: /var/lib/dnsmasq/dnsmasq.leases
+      state: absent
+
+  - name: Ensure dnsmasq is enabled
+    systemd:
+      name: dnsmasq
+      masked: no
+      enabled: yes
+
+  - name: Allow all access to tcp port 5353
+    community.general.ufw:
+      rule: allow
+      port: '5353'
+      proto: udp
+
+  - name: Disable systemd-resolved
+    ansible.builtin.systemd:
+      name: systemd-resolved
+      enabled: false
+      masked: yes
+
+  - name: Restart services
+    command: /bin/true
+    check_mode: false
+    notify:
+      - Restart dnsmasq
