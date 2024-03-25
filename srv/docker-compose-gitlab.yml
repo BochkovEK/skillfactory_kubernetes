@@ -2,6 +2,7 @@
 
 services:
   gitlab:
+    #cat /data/docker/gitlab/etc/gitlab/initial_root_password
     container_name: my-gitlab
     image: gitlab/gitlab-ce:latest
     hostname: gitlab
@@ -9,15 +10,15 @@ services:
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         gitlab_rails['gitlab_shell_ssh_port'] = 22
-        external_url 'https://my-gitlab:443'
+        external_url 'https://my-gitlab.my.domain:443'
     ports:
     - "443:443"
     - "80:80"
     - "2022:22"
     volumes:
-#      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
-#      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
-#      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+    - /data/docker/gitlab/etc/gitlab:/etc/gitlab
+    - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
+    - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
     - $HOME/ssl:/etc/gitlab/ssl
 
 #    networks:
@@ -28,10 +29,10 @@ services:
     image: gitlab/gitlab-runner:alpine
     restart: unless-stopped
     depends_on:
-      - gitlab
+    - gitlab
     volumes:
-      - $HOME/ssl:/etc/gitlab-runner/ssl
-      - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+    - $HOME/ssl:/etc/gitlab-runner/ssl
+    - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
 #    networks:
 #      - gitlab_net
 
