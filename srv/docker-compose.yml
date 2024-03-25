@@ -39,7 +39,7 @@ services:
 
   gitlab:
     #cat /data/docker/gitlab/etc/gitlab/initial_root_password
-    container_name: my-gitlab
+    container_name: gitlab
     image: gitlab/gitlab-ce:latest
     hostname: gitlab
     restart: unless-stopped
