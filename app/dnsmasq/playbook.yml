@@ -1,5 +1,5 @@
 # apt install -y ansible
-# ansible-playbook playbook.yaml
+# ansible-playbook playbook.yml
 - hosts:
     - nameserver
   become: yes
@@ -85,4 +85,10 @@
     command: /bin/true
     check_mode: false
     notify:
-      - Restart dnsmasq
+        - Restart dnsmasq
+
+  handlers:
+    - name: Restart dnsmasq
+      systemd:
+        name: dnsmasq
+        state: restarted
