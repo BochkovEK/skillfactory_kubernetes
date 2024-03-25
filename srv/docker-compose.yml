@@ -1,0 +1,73 @@
+#docker compose up -d
+volumes:
+  nexus-data: {}
+
+networks:
+  srv-network:
+    driver: bridge
+    name: srv
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+    - ./nginx_https.conf:/etc/nginx/nginx.conf
+    - $HOME/ssl:/etc/certs
+    #      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+#    network_mode: "host"
+    restart: always
+    networks:
+    - srv-network
+
+  nexus:
+    #docker exec -it nexus cat /nexus-data/admin.password
+    container_name: nexus
+    image: sonatype/nexus3
+    restart: always
+    volumes:
+    - "nexus-data:/sonatype-work"
+#    ports:
+#    - "8081:8081"
+#    - "8085:8085"
+#    - "5000:5000"
+    networks:
+    - srv-network
+
+  gitlab:
+    #cat /data/docker/gitlab/etc/gitlab/initial_root_password
+    container_name: my-gitlab
+    image: gitlab/gitlab-ce:latest
+    hostname: gitlab
+    restart: unless-stopped
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 22
+        external_url 'https://my-gitlab.my.domain'
+        #:443'
+    ports:
+#    - "443:443"
+#    - "80:80"
+    - "2022:22"
+    volumes:
+    - /data/docker/gitlab/etc/gitlab:/etc/gitlab
+    - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
+    - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+    - $HOME/ssl:/etc/gitlab/ssl
+    networks:
+    - srv-network
+
+  gitlab-runner:
+    container_name: gitlab-runner
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    depends_on:
+    - gitlab
+    volumes:
+    - $HOME/ssl:/etc/gitlab-runner/ssl
+    - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+    networks:
+    - srv-network
