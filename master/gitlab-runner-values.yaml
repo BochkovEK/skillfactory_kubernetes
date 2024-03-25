@@ -32,7 +32,7 @@ runners:
         privileged = true
   executor: kubernetes
   secret: dev-gitlab-runner
-securityContext:
+podSecurityContext:
   runAsUser: 100
   # runAsGroup: 65533
   fsGroup: 65533
