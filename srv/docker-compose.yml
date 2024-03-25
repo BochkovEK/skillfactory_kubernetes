@@ -49,7 +49,7 @@ services:
         external_url 'https://my-gitlab.my.domain'
         #:443'
     ports:
-#    - "443:443"
+    - "8443:443"
 #    - "80:80"
     - "2022:22"
     volumes:
