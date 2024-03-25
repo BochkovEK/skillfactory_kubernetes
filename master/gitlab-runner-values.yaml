@@ -31,7 +31,7 @@ runners:
         namespace = "{{.Release.Namespace}}"
         image = "alpine"
         privileged = true
-#  executor: kubernetes
+  executor: kubernetes
 #  secret: dev-gitlab-runner
 podSecurityContext:
   runAsUser: 100
