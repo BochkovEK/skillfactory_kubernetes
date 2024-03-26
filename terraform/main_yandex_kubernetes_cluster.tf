@@ -57,6 +57,19 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   name        = "k8s-public-services"
   description = "Правила группы разрешают подключение к сервисам из интернета. Примените правила только для групп узлов."
   network_id  = yandex_vpc_network.mynet.id
+
+  ingress {
+    protocol          = "TCP"
+    description       = "ssh"
+    from_port         = 0
+    to_port           = 22
+  }
+
+  ingress {
+    protocol          = "ICMP"
+    description       = "ping"
+  }
+
   ingress {
     protocol          = "TCP"
     description       = "Правило разрешает проверки доступности с диапазона адресов балансировщика нагрузки. Нужно для работы отказоустойчивого кластера Managed Service for Kubernetes и сервисов балансировщика."
