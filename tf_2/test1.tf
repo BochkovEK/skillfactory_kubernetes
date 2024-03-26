@@ -150,7 +150,7 @@ resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
   ingress {
     protocol       = "TCP"
     description    = "Rule allows connections to nodes over SSH from specified IPs."
-    v4_cidr_blocks = ["85.32.32.22/32"]
+    v4_cidr_blocks = ["0.0.0.0/0"]
     port           = 22
   }
 }
