@@ -250,7 +250,9 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     network_interface {
       nat                = true
       subnet_ids         = [yandex_vpc_subnet.mysubnet.id]
-      security_group_ids = [yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id]
+      security_group_ids = [
+        yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id
+      ]
     }
 
     resources {
@@ -263,10 +265,11 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
       size = 64 # Disk size in GB
     }
 
-#    Ключ user-dataне поддерживает передачу пользовательских данных. Параметры для ssh-подключений необходимо указать в ssh-keysключе метаданных ВМ.
+    #    Ключ user-dataне поддерживает передачу пользовательских данных. Параметры для ssh-подключений необходимо указать в ssh-keysключе метаданных ВМ.
     metadata = {
       ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
     }
+  }
 }
 
 # Container Registry
@@ -287,7 +290,7 @@ resource "local_sensitive_file" "key-json" {
     ]
  content = jsonencode({
     "id" : "${yandex_iam_service_account_key.sa-auth-key.id}",
-    "service_account_id" : "${yandex_iam_service_account.k8s-sa.id}",
+    "service_account_id" : "${yandex_iam_service_account.myaccount.id}",
     "created_at" : "${yandex_iam_service_account_key.sa-auth-key.created_at}",
     "key_algorithm" : "${yandex_iam_service_account_key.sa-auth-key.key_algorithm}",
     "public_key" : "${yandex_iam_service_account_key.sa-auth-key.public_key}",
@@ -295,6 +298,6 @@ resource "local_sensitive_file" "key-json" {
   })
   filename = "key.json"
 }
-}
+
 
 
