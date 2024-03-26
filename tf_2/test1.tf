@@ -160,50 +160,50 @@ resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "k8s-node-group" {
-  description = "Node group for Managed Service for Kubernetes cluster"
-  name        = "k8s-node-group"
-  cluster_id  = yandex_kubernetes_cluster.k8s-cluster.id
-  version     = var.k8s_version
-
-  scale_policy {
-    fixed_scale {
-      size = 2 # Number of hosts
-    }
-  }
-
-  allocation_policy {
-    location {
-      zone = "ru-central1-a"
-    }
-  }
-
-  instance_template {
-    platform_id = "standard-v2"
-
-    network_interface {
-      nat                = true
-      subnet_ids         = [yandex_vpc_subnet.mysubnet.id]
-      security_group_ids = [yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id]
-    }
-
-    resources {
-      memory = 4 # RAM quantity in GB
-      cores  = 4 # Number of CPU cores
-    }
-
-    boot_disk {
-      type = "network-hdd"
-      size = 64 # Disk size in GB
-    }
-
-    metadata = {
-	user-data = data.template_file.user_data.rendered
-    }
-
-#    metadata: {
-#  "user-data": "#cloud-config\nusers:\n  - name: ${var.vm_user}\n    groups: sudo\n    shell: /bin/bash\n    sudo: 'ALL=(ALL) NOPASSWD:ALL'\n    ssh-authorized-keys:\n      - ${file("${var.ssh_key_path}")}"
+#resource "yandex_kubernetes_node_group" "k8s-node-group" {
+#  description = "Node group for Managed Service for Kubernetes cluster"
+#  name        = "k8s-node-group"
+#  cluster_id  = yandex_kubernetes_cluster.k8s-cluster.id
+#  version     = var.k8s_version
+#
+#  scale_policy {
+#    fixed_scale {
+#      size = 2 # Number of hosts
 #    }
-  }
-}
+#  }
+#
+#  allocation_policy {
+#    location {
+#      zone = "ru-central1-a"
+#    }
+#  }
+#
+#  instance_template {
+#    platform_id = "standard-v2"
+#
+#    network_interface {
+#      nat                = true
+#      subnet_ids         = [yandex_vpc_subnet.mysubnet.id]
+#      security_group_ids = [yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id]
+#    }
+#
+#    resources {
+#      memory = 4 # RAM quantity in GB
+#      cores  = 4 # Number of CPU cores
+#    }
+#
+#    boot_disk {
+#      type = "network-hdd"
+#      size = 64 # Disk size in GB
+#    }
+#
+#    metadata = {
+#	user-data = data.template_file.user_data.rendered
+#    }
+#
+##    metadata: {
+##  "user-data": "#cloud-config\nusers:\n  - name: ${var.vm_user}\n    groups: sudo\n    shell: /bin/bash\n    sudo: 'ALL=(ALL) NOPASSWD:ALL'\n    ssh-authorized-keys:\n      - ${file("${var.ssh_key_path}")}"
+##    }
+#  }
+#}
 
