@@ -292,7 +292,6 @@ resources "local_sensitive_file" "key-json" {
     "key_algorithm" : "${yandex_iam_service_account_key.sa-auth-key.key_algorithm}",
     "public_key" : "${yandex_iam_service_account_key.sa-auth-key.public_key}",
     "private_key" : "${yandex_iam_service_account_key.sa-auth-key.private_key}"
-  })e_key" : "${yandex_iam_service_account_key.sa-auth-key.private_key}"
   })
   filename = "key.json"
 }
