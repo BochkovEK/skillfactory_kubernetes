@@ -198,11 +198,16 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     }
 
     metadata = {
-	user-data = data.template_file.user_data.rendered
+      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
     }
+}
+
+#    metadata = {
+#	user-data = data.template_file.user_data.rendered
+#    }
 
 #    metadata: {
-#  "user-data": "#cloud-config\nusers:\n  - name: ${var.vm_user}\n    groups: sudo\n    shell: /bin/bash\n    sudo: 'ALL=(ALL) NOPASSWD:ALL'\n    ssh-authorized-keys:\n      - ${file("${var.ssh_key_path}")}"
+#  "dev-data": "#cloud-config\nusers:\n  - name: ${var.vm_user}\n    groups: sudo\n    shell: /bin/bash\n    sudo: 'ALL=(ALL) NOPASSWD:ALL'\n    ssh-authorized-keys:\n      - ${file("${var.ssh_key_path}")}"
 #    }
   }
 }
