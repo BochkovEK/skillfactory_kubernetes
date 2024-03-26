@@ -181,4 +181,3 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
   }
 }
 
-}
