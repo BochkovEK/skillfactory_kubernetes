@@ -37,6 +37,8 @@ resource "yandex_kubernetes_cluster" "k8s-cluster" {
     yandex_resourcemanager_folder_iam_member.k8s-clusters-agent,
     yandex_resourcemanager_folder_iam_member.vpc-public-admin,
     yandex_resourcemanager_folder_iam_member.images-puller,
+    yandex_resourcemanager_folder_iam_binding.editor,
+    yandex_resourcemanager_folder_iam_binding.images-pusher,
     yandex_resourcemanager_folder_iam_member.encrypterDecrypter
   ]
   kms_provider {
@@ -58,6 +60,24 @@ resource "yandex_vpc_subnet" "mysubnet" {
 resource "yandex_iam_service_account" "myaccount" {
   name        = "zonal-k8s-account"
   description = "K8S zonal service account"
+}
+
+# Assign "editor" role to Kubernetes service account
+resource "yandex_resourcemanager_folder_iam_binding" "editor" {
+  folder_id = var.folder_id
+  role      = "editor"
+  members = [
+    "serviceAccount:${var.service_account_id}"
+  ]
+}
+
+# Assign "container-registry.images.pusher" role to Kubernetes service account
+resource "yandex_resourcemanager_folder_iam_binding" "images-pusher" {
+  folder_id = var.folder_id
+  role      = "container-registry.images.pusher"
+  members = [
+    "serviceAccount:${var.service_account_id}"
+  ]
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "k8s-clusters-agent" {
@@ -150,6 +170,46 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
     port           = 443
+  }
+}
+
+resource "yandex_vpc_default_security_group" "default-sg" {
+  description = "Default security group allows connections to Managed Service for GitLab"
+  network_id  = yandex_vpc_network.mynet.id
+
+  ingress {
+    description    = "The rule allows connection to Git repository by SSH on 22 port from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 22
+  }
+
+  ingress {
+    description    = "The rule allows connection to Git repository by SSH on 2222 port from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 2222
+  }
+
+  ingress {
+    description    = "The rule allows HTTP connections from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 80
+  }
+
+  ingress {
+    description    = "The rule allows HTTPS connections from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 443
+  }
+
+  ingress {
+    description    = "The rule allows connection to Yandex Container Registry on 5050 port"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 5050
   }
 }
 
