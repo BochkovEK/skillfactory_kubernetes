@@ -295,7 +295,6 @@ resources "local_sensitive_file" "key-json" {
   })
   filename = "key.json"
 }
-
 }
 
 
