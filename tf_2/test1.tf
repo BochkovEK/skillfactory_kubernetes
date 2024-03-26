@@ -18,9 +18,14 @@ provider "yandex" {
   zone                     = var.zone_name
 }
 
-#locals {
-#  folder_id   = "b1gia87mbaom********"
-#}
+data "template_file" "user_data" {
+  template = file("user_data.yaml")
+
+  vars = {
+    vm_user = var.vm_user
+    ssh_key_path = file(var.ssh_key_path)
+  }
+}
 
 resource "yandex_kubernetes_cluster" "k8s-cluster" {
   name = "k8s-cluster"
@@ -193,8 +198,12 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     }
 
     metadata = {
-      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
+	user-data = data.template_file.user_data.rendered
     }
+
+#    metadata: {
+#  "user-data": "#cloud-config\nusers:\n  - name: ${var.vm_user}\n    groups: sudo\n    shell: /bin/bash\n    sudo: 'ALL=(ALL) NOPASSWD:ALL'\n    ssh-authorized-keys:\n      - ${file("${var.ssh_key_path}")}"
+#    }
   }
 }
 
