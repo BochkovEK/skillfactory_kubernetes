@@ -139,6 +139,18 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     from_port      = 0
     to_port        = 65535
   }
+  ingress {
+    description    = "The rule allows connection to Kubernetes API on 6443 port from specified network."
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6443
+  }
+  ingress {
+    description    = "The rule allows connection to Kubernetes API on 443 port from specified network."
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 443
+  }
 }
 
 resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
