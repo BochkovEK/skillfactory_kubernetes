@@ -209,6 +209,6 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
 #    metadata: {
 #  "dev-data": "#cloud-config\nusers:\n  - name: ${var.vm_user}\n    groups: sudo\n    shell: /bin/bash\n    sudo: 'ALL=(ALL) NOPASSWD:ALL'\n    ssh-authorized-keys:\n      - ${file("${var.ssh_key_path}")}"
 #    }
-  }
 }
+
 
