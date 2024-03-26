@@ -26,6 +26,9 @@ resource "yandex_kubernetes_cluster" "k8s-cluster" {
       zone      = yandex_vpc_subnet.mysubnet.zone
       subnet_id = yandex_vpc_subnet.mysubnet.id
     }
+
+    public_ip = true
+
     security_group_ids = [yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id]
   }
   service_account_id      = yandex_iam_service_account.myaccount.id
@@ -188,6 +191,7 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
       size = 64 # Disk size in GB
     }
 
+#    Ключ user-dataне поддерживает передачу пользовательских данных. Параметры для ssh-подключений необходимо указать в ssh-keysключе метаданных ВМ.
     metadata = {
       ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
     }
