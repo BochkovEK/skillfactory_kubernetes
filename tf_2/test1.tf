@@ -270,18 +270,18 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
 }
 
 # Container Registry
-resources "yandex_container_registry" "container-registry" {
+resource "yandex_container_registry" "container-registry" {
   name      = var.registry_name
   folder_id = var.folder_id
 }
 
-resources  "yandex_iam_service_account_key" "sa-auth-key" {
+resource  "yandex_iam_service_account_key" "sa-auth-key" {
   description        = "Authorized key for service accaunt"
   service_account_id = yandex_iam_service_account.myaccount.id
 }
 
 # Local file with authorized key data
-resources "local_sensitive_file" "key-json" {
+resource "local_sensitive_file" "key-json" {
   depends_on = [
     yandex_iam_service_account_key.sa-auth-key,
     ]
