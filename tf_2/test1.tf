@@ -178,6 +178,10 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
       type = "network-hdd"
       size = 64 # Disk size in GB
     }
+
+    metadata = {
+      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
+    }
   }
 }
 
