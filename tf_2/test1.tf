@@ -22,8 +22,8 @@ provider "yandex" {
 #  folder_id   = "b1gia87mbaom********"
 #}
 
-resource "yandex_kubernetes_cluster" "k8s-zonal" {
-  name = "k8s-zonal"
+resource "yandex_kubernetes_cluster" "k8s-cluster" {
+  name = "k8s-cluster"
   network_id = yandex_vpc_network.mynet.id
   master {
     master_location {
@@ -115,29 +115,70 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     to_port           = 65535
   }
   ingress {
-    protocol          = "ANY"
-    description       = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера Managed Service for Kubernetes и сервисов."
-    v4_cidr_blocks    = concat(yandex_vpc_subnet.mysubnet.v4_cidr_blocks)
-    from_port         = 0
-    to_port           = 65535
+    protocol       = "ANY"
+    description    = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера Managed Service for Kubernetes и сервисов."
+    v4_cidr_blocks = concat(yandex_vpc_subnet.mysubnet.v4_cidr_blocks)
+    from_port      = 0
+    to_port        = 65535
   }
   ingress {
-    protocol          = "ICMP"
-    description       = "Правило разрешает отладочные ICMP-пакеты из внутренних подсетей."
-    v4_cidr_blocks    = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+    protocol       = "ICMP"
+    description    = "Правило разрешает отладочные ICMP-пакеты из внутренних подсетей."
+    v4_cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   }
   ingress {
-    protocol          = "TCP"
-    description       = "Правило разрешает входящий трафик из интернета на диапазон портов NodePort. Добавьте или измените порты на нужные вам."
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    from_port         = 30000
-    to_port           = 32767
+    protocol       = "TCP"
+    description    = "Правило разрешает входящий трафик из интернета на диапазон портов NodePort. Добавьте или измените порты на нужные вам."
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 30000
+    to_port        = 32767
   }
   egress {
-    protocol          = "ANY"
-    description       = "Правило разрешает весь исходящий трафик. Узлы могут связаться с Yandex Container Registry, Yandex Object Storage, Docker Hub и т. д."
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    from_port         = 0
-    to_port           = 65535
+    protocol       = "ANY"
+    description    = "Правило разрешает весь исходящий трафик. Узлы могут связаться с Yandex Container Registry, Yandex Object Storage, Docker Hub и т. д."
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 0
+    to_port        = 65535
   }
+}
+
+resource "yandex_kubernetes_node_group" "k8s-node-group" {
+  description = "Node group for Managed Service for Kubernetes cluster"
+  name        = "k8s-node-group"
+  cluster_id  = yandex_kubernetes_cluster.k8s-cluster.id
+  version     = var.k8s_version
+
+  scale_policy {
+    fixed_scale {
+      size = 2 # Number of hosts
+    }
+  }
+
+  allocation_policy {
+    location {
+      zone = "ru-central1-a"
+    }
+  }
+
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat                = true
+      subnet_ids         = [yandex_vpc_subnet.mysubnet.id]
+      security_group_ids = [yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-public-services.id]
+    }
+
+    resources {
+      memory = 4 # RAM quantity in GB
+      cores  = 4 # Number of CPU cores
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 64 # Disk size in GB
+    }
+  }
+}
+
 }

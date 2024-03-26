@@ -1,3 +1,7 @@
+variable "k8s_version" {
+  type = string
+}
+
 variable "cloud_id" {
   type = string
 }
