@@ -60,18 +60,6 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
 
   ingress {
     protocol          = "TCP"
-    description       = "ssh"
-    from_port         = 0
-    to_port           = 22
-  }
-
-  ingress {
-    protocol          = "ICMP"
-    description       = "ping"
-  }
-
-  ingress {
-    protocol          = "TCP"
     description       = "Правило разрешает проверки доступности с диапазона адресов балансировщика нагрузки. Нужно для работы отказоустойчивого кластера Managed Service for Kubernetes и сервисов балансировщика."
     predefined_target = "loadbalancer_healthchecks"
     from_port         = 0
