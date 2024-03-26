@@ -28,3 +28,8 @@ variable "vm_user" {
   type        = string
 }
 
+variable "registry_name" {
+  description = "registry_name"
+  type        = string
+}
+

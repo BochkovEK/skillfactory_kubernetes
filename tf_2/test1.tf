@@ -269,6 +269,34 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     }
 }
 
+# Container Registry
+resources "yandex_container_registry" "container-registry" {
+  name      = var.registry_name
+  folder_id = var.folder_id
+}
+
+resources  "yandex_iam_service_account_key" "sa-auth-key" {
+  description        = "Authorized key for service accaunt"
+  service_account_id = yandex_iam_service_account.myaccount.id
+}
+
+# Local file with authorized key data
+resources "local_sensitive_file" "key-json" {
+  depends_on = [
+    yandex_iam_service_account_key.sa-auth-key,
+    ]
+ content = jsonencode({
+    "id" : "${yandex_iam_service_account_key.sa-auth-key.id}",
+    "service_account_id" : "${yandex_iam_service_account.k8s-sa.id}",
+    "created_at" : "${yandex_iam_service_account_key.sa-auth-key.created_at}",
+    "key_algorithm" : "${yandex_iam_service_account_key.sa-auth-key.key_algorithm}",
+    "public_key" : "${yandex_iam_service_account_key.sa-auth-key.public_key}",
+    "private_key" : "${yandex_iam_service_account_key.sa-auth-key.private_key}"
+  })e_key" : "${yandex_iam_service_account_key.sa-auth-key.private_key}"
+  })
+  filename = "key.json"
+}
+
 }
 
 
