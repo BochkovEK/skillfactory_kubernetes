@@ -100,19 +100,6 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   name        = "k8s-public-services"
   description = "Правила группы разрешают подключение к сервисам из интернета. Примените правила только для групп узлов."
   network_id  = yandex_vpc_network.mynet.id
-
-  ingress {
-    protocol          = "TCP"
-    description       = "ssh"
-    from_port         = 0
-    to_port           = 22
-  }
-
-  ingress {
-    protocol          = "ICMP"
-    description       = "ping"
-  }
-
   ingress {
     protocol          = "TCP"
     description       = "Правило разрешает проверки доступности с диапазона адресов балансировщика нагрузки. Нужно для работы отказоустойчивого кластера Managed Service for Kubernetes и сервисов балансировщика."
@@ -152,6 +139,19 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     v4_cidr_blocks = ["0.0.0.0/0"]
     from_port      = 0
     to_port        = 65535
+  }
+}
+
+resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
+  name        = "k8s-nodes-ssh-access"
+  description = "Group rules allow connections to cluster nodes over SSH. Apply the rules only for node groups."
+  network_id  = yandex_vpc_network.mynet.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Rule allows connections to nodes over SSH from specified IPs."
+    v4_cidr_blocks = ["85.32.32.22/32"]
+    port           = 22
   }
 }
 
