@@ -110,6 +110,14 @@ resource "yandex_vpc_security_group" "k8s-main-sg" {
     from_port      = 0
     to_port        = 65535
   }
+
+   ingress {
+    description    = "The rule allows incoming traffic from the internet to django app."
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 3000
+    to_port        = 3500
+  }
 }
 
 resource "yandex_vpc_security_group" "k8s-public-services" {
