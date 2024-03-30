@@ -100,8 +100,8 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     description    = "The rule allows incoming traffic from the internet to the NodePort port range. Add ports or change existing ones to the required ports."
     protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port      = 30000
-    to_port        = 32767
+    from_port      = 3000
+    to_port        = 3500
   }
 }
 
@@ -187,6 +187,38 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     boot_disk {
       type = "network-hdd"
       size = 64 # Disk size in GB
+    }
+  }
+}
+
+resource "yandex_lb_network_load_balancer" "load_balancer" {
+  name = "my-network-load-balancer"
+
+  listener {
+    name = "my-http-listener"
+    port = 8080
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+  }
+
+   listener {
+    name = "my-django-listener"
+    port = 3003
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+  }
+
+  attached_target_group {
+    target_group_id = yandex_kubernetes_node_group.k8s-node-group.id
+
+    healthcheck {
+      name = "http"
+      http_options {
+        port = 8080
+        path = "/ping"
+      }
     }
   }
 }
