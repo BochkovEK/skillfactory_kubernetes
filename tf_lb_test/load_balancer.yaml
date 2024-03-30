@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadbalancer
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 3003
+    name: plaintext
+    annotations:
+    # Параметры проверки состояния узлов
+    yandex.cloud/load-balancer-healthcheck-healthy-threshold: "2"
+    yandex.cloud/load-balancer-healthcheck-interval: "2s"
+    targetPort: 3003
+  selector:
+    app: django-app # App name
+  loadBalancerIP: 158.160.49.15
+  externalTrafficPolicy: Cluster
