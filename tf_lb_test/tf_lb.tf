@@ -196,15 +196,20 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
       type = "network-hdd"
       size = 64 # Disk size in GB
     }
+
+    #    Ключ user-dataне поддерживает передачу пользовательских данных. Параметры для ssh-подключений необходимо указать в ssh-keysключе метаданных ВМ.
+    metadata = {
+      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
+    }
   }
 }
 
-resource "yandex_vpc_address" "loadbalancer-addr" {
-  name = "loadbalancer-addr"
-  external_ipv4_address {
-    zone_id = yandex_vpc_subnet.subnet-a.zone
-  }
-}
+#resource "yandex_vpc_address" "loadbalancer-addr" {
+#  name = "loadbalancer-addr"
+#  external_ipv4_address {
+#    zone_id = yandex_vpc_subnet.subnet-a.zone
+#  }
+#}
 
 #resource "yandex_lb_target_group" "foo" {
 #  name      = "my-target-group"
