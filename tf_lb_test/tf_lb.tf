@@ -199,34 +199,51 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
   }
 }
 
-resource "yandex_lb_network_load_balancer" "load_balancer" {
-  name = "my-network-load-balancer"
-
-  listener {
-    name = "my-http-listener"
-    port = 8080
-    external_address_spec {
-      ip_version = "ipv4"
-    }
-  }
-
-   listener {
-    name = "my-django-listener"
-    port = 3003
-    external_address_spec {
-      ip_version = "ipv4"
-    }
-  }
-
-  attached_target_group {
-    target_group_id = yandex_kubernetes_node_group.k8s-node-group.id
-
-    healthcheck {
-      name = "http"
-      http_options {
-        port = 8080
-        path = "/ping"
-      }
-    }
+resource "yandex_vpc_address" "loadbalancer-addr" {
+  name = "loadbalancer-addr"
+  external_ipv4_address {
+    zone_id = yandex_vpc_subnet.subnet-a.zone
   }
 }
+
+#resource "yandex_lb_target_group" "foo" {
+#  name      = "my-target-group"
+#  region_id = "ru-central1"
+#
+#  target {
+#    subnet_id = yandex_vpc_subnet.subnet-a.id
+#    address   = yandex_kubernetes_node_group.k8s-node-group.
+#  }
+#}
+
+#resource "yandex_lb_network_load_balancer" "load_balancer" {
+#  name = "my-network-load-balancer"
+#
+#  listener {
+#    name = "my-http-listener"
+#    port = 8080
+#    external_address_spec {
+#      ip_version = "ipv4"
+#    }
+#  }
+#
+#   listener {
+#    name = "my-django-listener"
+#    port = 3003
+#    external_address_spec {
+#      ip_version = "ipv4"
+#    }
+#  }
+#
+#  attached_target_group {
+#    target_group_id = yandex_kubernetes_node_group.k8s-node-group.id
+#
+#    healthcheck {
+#      name = "http"
+#      http_options {
+#        port = 8080
+#        path = "/ping"
+#      }
+#    }
+#  }
+#}
