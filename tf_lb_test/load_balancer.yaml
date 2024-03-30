@@ -9,8 +9,8 @@ spec:
     name: plaintext
     annotations:
     # Параметры проверки состояния узлов
-    yandex.cloud/load-balancer-healthcheck-healthy-threshold: "2"
-    yandex.cloud/load-balancer-healthcheck-interval: "2s"
+      yandex.cloud/load-balancer-healthcheck-healthy-threshold: "2"
+      yandex.cloud/load-balancer-healthcheck-interval: "2s"
     targetPort: 3003
   selector:
     app: django-app # App name
