@@ -29,7 +29,9 @@ resource "yandex_kubernetes_cluster" "k8s-cluster" {
 
     public_ip = true
 
-    security_group_ids = [yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id]
+    security_group_ids = [yandex_vpc_security_group.k8s-public-services.id,
+                          yandex_vpc_default_security_group.default-sg.id
+    ]
   }
   service_account_id      = yandex_iam_service_account.myaccount.id
   node_service_account_id = yandex_iam_service_account.myaccount.id
@@ -213,18 +215,18 @@ resource "yandex_vpc_default_security_group" "default-sg" {
   }
 }
 
-resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
-  name        = "k8s-nodes-ssh-access"
-  description = "Group rules allow connections to cluster nodes over SSH. Apply the rules only for node groups."
-  network_id  = yandex_vpc_network.mynet.id
-
-  ingress {
-    protocol       = "TCP"
-    description    = "Rule allows connections to nodes over SSH from specified IPs."
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 22
-  }
-}
+#resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
+#  name        = "k8s-nodes-ssh-access"
+#  description = "Group rules allow connections to cluster nodes over SSH. Apply the rules only for node groups."
+#  network_id  = yandex_vpc_network.mynet.id
+#
+#  ingress {
+#    protocol       = "TCP"
+#    description    = "Rule allows connections to nodes over SSH from specified IPs."
+#    v4_cidr_blocks = ["0.0.0.0/0"]
+#    port           = 22
+#  }
+#}
 
 resource "yandex_kubernetes_node_group" "k8s-node-group" {
   description = "Node group for Managed Service for Kubernetes cluster"
@@ -251,7 +253,8 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
       nat                = true
       subnet_ids         = [yandex_vpc_subnet.mysubnet.id]
       security_group_ids = [
-        yandex_vpc_security_group.k8s-public-services.id, yandex_vpc_security_group.k8s-nodes-ssh-access.id
+        yandex_vpc_security_group.k8s-public-services.id,
+        yandex_vpc_default_security_group.default-sg.id
       ]
     }
 
