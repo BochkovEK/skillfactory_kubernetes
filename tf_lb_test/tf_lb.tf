@@ -160,49 +160,49 @@ resource "yandex_kubernetes_cluster" "k8s-cluster" {
   ]
 }
 
-resource "yandex_kubernetes_node_group" "k8s-node-group" {
-  description = "Node group for the Managed Service for Kubernetes cluster"
-  name        = local.k8s_node_group_name
-  cluster_id  = yandex_kubernetes_cluster.k8s-cluster.id
-  version     = local.k8s_version
-
-  scale_policy {
-    fixed_scale {
-      size = 1 # Number of hosts
-    }
-  }
-
-  allocation_policy {
-    location {
-      zone = yandex_vpc_subnet.subnet-a.zone
-    }
-  }
-
-  instance_template {
-    platform_id = "standard-v2" # Intel Cascade Lake
-
-    network_interface {
-      nat                = true
-      subnet_ids         = [yandex_vpc_subnet.subnet-a.id]
-      security_group_ids = [yandex_vpc_security_group.k8s-main-sg.id]
-    }
-
-    resources {
-      memory = 4 # RAM quantity in GB
-      cores  = 4 # Number of CPU cores
-    }
-
-    boot_disk {
-      type = "network-hdd"
-      size = 64 # Disk size in GB
-    }
-
-    #    Ключ user-dataне поддерживает передачу пользовательских данных. Параметры для ssh-подключений необходимо указать в ssh-keysключе метаданных ВМ.
-    metadata = {
-      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
-    }
-  }
-}
+#resource "yandex_kubernetes_node_group" "k8s-node-group" {
+#  description = "Node group for the Managed Service for Kubernetes cluster"
+#  name        = local.k8s_node_group_name
+#  cluster_id  = yandex_kubernetes_cluster.k8s-cluster.id
+#  version     = local.k8s_version
+#
+#  scale_policy {
+#    fixed_scale {
+#      size = 1 # Number of hosts
+#    }
+#  }
+#
+#  allocation_policy {
+#    location {
+#      zone = yandex_vpc_subnet.subnet-a.zone
+#    }
+#  }
+#
+#  instance_template {
+#    platform_id = "standard-v2" # Intel Cascade Lake
+#
+#    network_interface {
+#      nat                = true
+#      subnet_ids         = [yandex_vpc_subnet.subnet-a.id]
+#      security_group_ids = [yandex_vpc_security_group.k8s-main-sg.id]
+#    }
+#
+#    resources {
+#      memory = 4 # RAM quantity in GB
+#      cores  = 4 # Number of CPU cores
+#    }
+#
+#    boot_disk {
+#      type = "network-hdd"
+#      size = 64 # Disk size in GB
+#    }
+#
+#    #    Ключ user-dataне поддерживает передачу пользовательских данных. Параметры для ssh-подключений необходимо указать в ssh-keysключе метаданных ВМ.
+#    metadata = {
+#      ssh-keys = "${var.vm_user}:${file("${var.ssh_key_path}")}"
+#    }
+#  }
+#}
 
 #resource "yandex_vpc_address" "loadbalancer-addr" {
 #  name = "loadbalancer-addr"
