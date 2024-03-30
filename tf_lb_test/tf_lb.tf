@@ -39,6 +39,27 @@ resource "yandex_vpc_security_group" "k8s-main-sg" {
   network_id  = yandex_vpc_network.k8s-network.id
 
   ingress {
+    description    = "The rule allows connection to Git repository by SSH on 22 port from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 22
+  }
+
+  ingress {
+    description    = "The rule allows connection to Git repository by SSH on 2222 port from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 2222
+  }
+
+  ingress {
+    description    = "The rule allows HTTP connections from the Internet"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 80
+  }
+
+  ingress {
     description       = "The rule allows availability checks from the load balancer's range of addresses. It is required for the operation of a fault-tolerant cluster and load balancer services."
     protocol          = "TCP"
     predefined_target = "loadbalancer_healthchecks" # The load balancer's address range.
