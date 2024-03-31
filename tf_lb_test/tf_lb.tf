@@ -140,6 +140,14 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     from_port      = 8000
     to_port        = 9000
   }
+
+  ingress {
+    description    = ""
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 70
+    to_port        = 90
+  }
 }
 
 resource "yandex_iam_service_account" "k8s-sa" {
