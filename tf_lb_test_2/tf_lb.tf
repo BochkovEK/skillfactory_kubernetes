@@ -6,9 +6,9 @@
 # Set the configuration of the Managed Service for Kubernetes cluster:
 
 locals {
-  folder_id   = var.folder_id            # Set your cloud folder ID.
-  k8s_version = var.k8s_version            # Set the Kubernetes version.
-  sa_name     = "admin-lb-kuber"            # Set the service account name
+  folder_id   = ""            # Set your cloud folder ID.
+  k8s_version = ""            # Set the Kubernetes version.
+  sa_name     = ""            # Set the service account name
 
   # The following settings are predefined. Change them only if necessary.
   network_name              = "k8s-network" # Name of the network
@@ -38,15 +38,7 @@ resource "yandex_vpc_security_group" "k8s-main-sg" {
   name        = local.main_security_group_name
   network_id  = yandex_vpc_network.k8s-network.id
 
-  ingress {
-    protocol       = "ANY"
-    description    = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера и сервисов."
-    v4_cidr_blocks = ["10.96.0.0/16", "10.112.0.0/16"]
-    from_port      = 0
-    to_port        = 65535
-  }
-
-  ingress {
+    ingress {
     description    = "The rule allows connection to Git repository by SSH on 22 port from the Internet"
     protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
@@ -54,23 +46,9 @@ resource "yandex_vpc_security_group" "k8s-main-sg" {
   }
 
   ingress {
-    description    = "The rule allows connection to Git repository by SSH on 2222 port from the Internet"
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 2222
-  }
-
-  ingress {
-    description    = "The rule allows HTTP connections from the Internet"
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 80
-  }
-
-  ingress {
     description       = "The rule allows availability checks from the load balancer's range of addresses. It is required for the operation of a fault-tolerant cluster and load balancer services."
     protocol          = "TCP"
-    predefined_target = "loadbalancer_healthchecks" # The load balancer's address range.
+    predefined_target = ["198.18.235.0/24", "198.18.248.0/24"] # The load balancer's address range.
     from_port         = 0
     to_port           = 65535
   }
@@ -118,14 +96,6 @@ resource "yandex_vpc_security_group" "k8s-main-sg" {
     from_port      = 0
     to_port        = 65535
   }
-
-   ingress {
-    description    = "The rule allows incoming traffic from the internet to django app."
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port      = 3000
-    to_port        = 3500
-  }
 }
 
 resource "yandex_vpc_security_group" "k8s-public-services" {
@@ -137,24 +107,8 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     description    = "The rule allows incoming traffic from the internet to the NodePort port range. Add ports or change existing ones to the required ports."
     protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port      = 3000
-    to_port        = 3500
-  }
-
-    ingress {
-    description    = ""
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port      = 8000
-    to_port        = 9000
-  }
-
-  ingress {
-    description    = ""
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port      = 70
-    to_port        = 90
+    from_port      = 30000
+    to_port        = 32767
   }
 }
 
@@ -248,52 +202,3 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     }
   }
 }
-
-#resource "yandex_vpc_address" "loadbalancer-addr" {
-#  name = "loadbalancer-addr"
-#  external_ipv4_address {
-#    zone_id = yandex_vpc_subnet.subnet-a.zone
-#  }
-#}
-
-#resource "yandex_lb_target_group" "foo" {
-#  name      = "my-target-group"
-#  region_id = "ru-central1"
-#
-#  target {
-#    subnet_id = yandex_vpc_subnet.subnet-a.id
-#    address   = yandex_kubernetes_node_group.k8s-node-group.
-#  }
-#}
-
-#resource "yandex_lb_network_load_balancer" "load_balancer" {
-#  name = "my-network-load-balancer"
-#
-#  listener {
-#    name = "my-http-listener"
-#    port = 8080
-#    external_address_spec {
-#      ip_version = "ipv4"
-#    }
-#  }
-#
-#   listener {
-#    name = "my-django-listener"
-#    port = 3003
-#    external_address_spec {
-#      ip_version = "ipv4"
-#    }
-#  }
-#
-#  attached_target_group {
-#    target_group_id = yandex_kubernetes_node_group.k8s-node-group.id
-#
-#    healthcheck {
-#      name = "http"
-#      http_options {
-#        port = 8080
-#        path = "/ping"
-#      }
-#    }
-#  }
-#}

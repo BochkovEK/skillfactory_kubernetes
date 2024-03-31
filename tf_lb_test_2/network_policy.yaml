@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: whitelist-netpol
+#  namespace: ns-example
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # Диапазоны адресов, используемые балансировщиком для проверки состояния узлов.
+    - ipBlock:
+        cidr: 10.112.0.0/16
+    #- ipBlock:
+    #    cidr: 198.18.248.0/24
+    # Диапазоны адресов подов.
+    - ipBlock:
+        cidr: 10.96.0.0/16
+    #- ipBlock:
+    #    cidr: 172.16.2.0/12
